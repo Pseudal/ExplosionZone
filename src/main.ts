@@ -77,7 +77,7 @@ function mobDetection() {
   } else {
     entities.forEach((ent) => {
       if (
-        (ent.Type == 4 || ent.Type ==292)
+        (ent.Type == 4 || ent.Type ==292 || ent.IsEnemy())
       ) {
         enemy.push(ent);
       }
@@ -92,14 +92,10 @@ function spawnCondition() {
     let EntSprite = ent.GetSprite();
     //debugComing(ent, EntSprite, data);
 
-    if(hasNoDmg == false){
-      if (ent.ToBomb().IsFetus == true && config.AllowFoetus == false) {
-        return
-      }
-
-        if(ent.Type == 25 && data.DangerExplosion !== 1){
-          data.DangerExplosion = 1
-          SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
+    if(hasNoDmg == false) {
+      if(ent.Type == 4){
+        if (ent.ToBomb().IsFetus == true && config.AllowFoetus == false) {
+          return
         }
 
         if(ent.Type == 4 && data.DangerExplosion !== 1){
@@ -115,20 +111,62 @@ function spawnCondition() {
             SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
           }
         }
-
-        if(ent.Type == 292 && data.DangerExplosion !== 1 && ent.ToNPC().State == 3 && ent.Variant !==751){
-          data.DangerExplosion = 1
-          SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
-        }
-
         if(ent.Type == 4 && data.DangerExplosion !== 1 && (ent.Variant == 17 || ent.Variant == 20) ){
           data.DangerExplosion = 1
           SpawnZoneExplosion(ent, EntSprite, data, 1.5, 80)
         }
-        if((ent.IsDead() || ent.Exists() !== true ||( ent.Type == 292 && ent.ToNPC().State == 16)) && data.DangerExplosion == 1){
-          data.ExplosionZoneLink.Remove();
-          data.DangerExplosion = 0;
-        }
+      }
+      if((ent.Type == 16 && ent.Variant ==2&& data.DangerExplosion !== 1)){
+        data.DangerExplosion = 1
+        SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
+      }
+
+      if((ent.Type == 25 && (ent.Variant ==2||ent.Variant ==0||ent.Variant ==5)&& data.DangerExplosion !== 1)){
+        data.DangerExplosion = 1
+        SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
+      }
+
+      if((ent.Type == 301 && (ent.Variant ==0)&& data.DangerExplosion !== 1)){
+        data.DangerExplosion = 1
+        SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
+      }
+      if((ent.Type == 55 && (ent.Variant !==0)&& data.DangerExplosion !== 1)){
+        data.DangerExplosion = 1
+        SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
+      }
+      if((ent.Type == 250 && (ent.Variant ==0)&& data.DangerExplosion !== 1)){
+        data.DangerExplosion = 1
+        SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
+      }
+      if((ent.Type == 225 && (ent.Variant ==0)&& data.DangerExplosion !== 1)){
+        data.DangerExplosion = 1
+        SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
+      }
+      if((ent.Type == 277 && (ent.Variant ==0)&& data.DangerExplosion !== 1)){
+        data.DangerExplosion = 1
+        SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
+      }
+      if((ent.Type == 892 && (ent.Variant ==0)&& data.DangerExplosion !== 1)){
+        data.DangerExplosion = 1
+        SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
+      }
+      if((ent.Type == 875 && (ent.Variant ==0)&& data.DangerExplosion !== 1)){
+        data.DangerExplosion = 1
+        SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
+      }
+      if((ent.Type == 293 && (ent.Variant ==2)&& data.DangerExplosion !== 1)){
+        data.DangerExplosion = 1
+        SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
+      }
+      if(ent.Type == 292 && data.DangerExplosion !== 1 && ent.ToNPC().State == 3 && ent.Variant !==751){
+        data.DangerExplosion = 1
+        SpawnZoneExplosion(ent, EntSprite, data, 0.95, 50)
+      }
+
+      if((ent.IsDead() || ent.Exists() !== true ||( ent.Type == 292 && ent.ToNPC().State == 16)) && data.DangerExplosion == 1){
+        data.ExplosionZoneLink.Remove();
+        data.DangerExplosion = 0;
+      }
     }
   });
   //! security
