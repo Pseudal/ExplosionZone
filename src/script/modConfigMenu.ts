@@ -1,17 +1,35 @@
 export function ModConfig(config) {
   if (ModConfigMenu !== undefined) {
-    ModConfigMenu.RemoveCategory("BoomZone!");
+    ModConfigMenu.RemoveCategory("Watch out, boom!");
 
-    ModConfigMenu.AddSpace("BoomZone", "About");
-    ModConfigMenu.AddText("BoomZone","About",() => "BoomZone",);
-    ModConfigMenu.AddSpace("BoomZone", "About");
-    ModConfigMenu.AddText("BoomZone", "About", () => `Version 0.8`);
+    ModConfigMenu.AddSpace("Watch out, boom!", "About");
+    ModConfigMenu.AddText("Watch out, boom!","About",() => "Watch out, boom!",);
+    ModConfigMenu.AddSpace("Watch out, boom!", "About");
+    ModConfigMenu.AddText("Watch out, boom!", "About", () => `Version 0.5`);
 
-    ModConfigMenu.AddSpace("BoomZone", "About");
-    ModConfigMenu.AddText("BoomZone", "About", () => "Mod made by Tidloas with love");
-    ModConfigMenu.AddSpace("BoomZone", "About");
+    ModConfigMenu.AddSpace("Watch out, boom!", "About");
+    ModConfigMenu.AddText("Watch out, boom!", "About", () => "Mod made by Tidloas with love");
+    ModConfigMenu.AddSpace("Watch out, boom!", "About");
 
-    ModConfigMenu.AddSetting("BoomZone", `Main`, {
+    ModConfigMenu.AddSetting("Watch out, boom!", `Mains`, {
+      Type: ModConfigMenuOptionType.BOOLEAN,
+      CurrentSetting() {
+        return config.Pulse;
+      },
+      Display() {
+        let onOff = "Disabled";
+        if (config.Pulse == true) {
+          onOff = "Enabled";
+        }
+        return `Pulse effect: ${onOff}`;
+      },
+      OnChange(IsOn) {
+        config.Pulse = IsOn as boolean;
+      },
+      Info: [`Danger zone has pulse effect ?`],
+    });
+
+    ModConfigMenu.AddSetting("Watch out, boom!", `Mains`, {
       Type: ModConfigMenuOptionType.BOOLEAN,
       CurrentSetting() {
         return config.AllowFoetus;
@@ -30,7 +48,7 @@ export function ModConfig(config) {
     });
 
     function addItem(entity, type, name, desc) {
-      ModConfigMenu.AddSetting("BoomZone", `${type}`, {
+      ModConfigMenu.AddSetting("Watch out, boom!", `${type}`, {
         Type: ModConfigMenuOptionType.BOOLEAN,
         CurrentSetting() {
           return config[entity];
@@ -48,11 +66,22 @@ export function ModConfig(config) {
         Info: [`${desc}`],
       });
     }
-    addItem("Hitbox", "Main", "Real Hitbox", "Shows the real hitbox of some lasers, mainly the holy laser of uriel and gabriel..");
+    addItem("Bomb", "Mains", "Bomb", "Displays the area for 'classic' bombs");
+    addItem("Troll", "Mains", "Troll", "Displays the area for 'troll' bombs");
+    addItem("Megabomb", "Mains", "Mega bomb", "Displays the area for 'mega' bombs");
+    addItem("TNT", "Mains", "TNT", "Displays the area for 'tnt'");
+    addItem("Mouche", "Mains", "Boom Fly", "Displays the area for Boom Fly");
+    addItem("Mulliboom", "Mains", "Mulliboom", "Displays the area for Mulliboom");
+    addItem("PoisonMind", "Mains", "PoisonMind", "Displays the area for PoisonMind");
+    addItem("Leech", "Mains", "Leech", "Displays the area for Leech");
+    addItem("Spider", "Mains", "Spider bomb", "Displays the area for Spider bomb");
+    addItem("Maw", "Mains", "Black Maw", "Displays the area for Black Maw");
+    addItem("BlackBony", "Mains", "Black Bony", "Displays the area for Black Bony");
+    addItem("Poofer", "Mains", "Poofer", "Displays the area for Poofer");
+    addItem("PootMine", "Mains", "Poot Mine", "Displays the area for Poot Mine");
+    addItem("GreedCoin", "Mains", "Greed Coin", "Displays the area for Greed Bomb Coin");
 
-    ModConfigMenu.AddSpace("BoomZone", "ChangeLog");
-    ModConfigMenu.AddText("BoomZone", "ChangeLog", () => "+Fix some bugs");
-    ModConfigMenu.AddText("BoomZone", "ChangeLog", () => "+Fix for tracing on pets or other.");
-    ModConfigMenu.AddText("BoomZone", "ChangeLog", () => "+Delirium v1(Disabled by default)");
+    ModConfigMenu.AddSpace("Watch out, boom!", "ChangeLog");
+    ModConfigMenu.AddText("Watch out, boom!", "ChangeLog", () => "Hello World");
   }
 }

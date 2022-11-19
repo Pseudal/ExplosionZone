@@ -1,3 +1,18 @@
 export let config = {
-  AllowFoetus: true
+  Pulse: true,
+  AllowFoetus: true,
+  Bomb: true,
+  Troll: true,
+  Mouche: true,
+  Megabomb: false,
+  Mulliboom: false,
+  PoisonMind: false,
+  TNT: false,
+  Leech: false,
+  Spider: false,
+  Maw: false,
+  BlackBony: false,
+  Poofer: false,
+  PootMine: false,
+  GreedCoin: false,
 }
