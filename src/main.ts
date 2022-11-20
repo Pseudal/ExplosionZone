@@ -1,5 +1,5 @@
 import { ModCallback, ProjectileFlag, TearFlag } from "isaac-typescript-definitions";
-import { bitFlags, ModCallbackCustom, PickingUpItem, printConsole, upgradeMod } from "isaacscript-common";
+import { bitFlags, ModCallbackCustom, PickingUpItem, upgradeMod } from "isaacscript-common";
 import { configWOExplosion } from "./script/Config";
 import { ModConfig } from "./script/modConfigMenu";
 import * as json from "json";
@@ -38,7 +38,7 @@ function SpawnZoneExplosion(ent, EntSprite, data, scale, scale2, Ypos) {
 
 //*Detect tnt (grid)
 function TntDetection() {
-  if(hasIpecac !== false && configWOExplosion.Ipecac == true){
+  if(hasIpecac !== false && configWOExplosion.Ipecac == true){//For room change
     let player = Isaac.GetPlayer()
     let data = player.GetData()as unknown as DangerExplosionData
       if(data.Danger !== 0){
