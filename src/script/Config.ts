@@ -1,6 +1,6 @@
-export let config = {
+export let configWOExplosion = {
   Effect: 1,
-  AllowFoetus: true,
+  AllowFoetus: false,
   Ipecac:false,
   Bomb: true,
   Troll: true,

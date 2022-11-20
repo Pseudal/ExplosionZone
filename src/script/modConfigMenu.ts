@@ -1,70 +1,70 @@
-export function ModConfig(config) {
+export function ModConfig(configWOExplosion) {
   if (ModConfigMenu !== undefined) {
-    ModConfigMenu.RemoveCategory("Watch out, boom!");
+    ModConfigMenu.RemoveCategory("Watch out, explosion!");
 
-    ModConfigMenu.AddSpace("Watch out, boom!", "About");
-    ModConfigMenu.AddText("Watch out, boom!","About",() => "Watch out, boom!",);
-    ModConfigMenu.AddSpace("Watch out, boom!", "About");
-    ModConfigMenu.AddText("Watch out, boom!", "About", () => `Version 0.5`);
+    ModConfigMenu.AddSpace("Watch out, explosion!", "About");
+    ModConfigMenu.AddText("Watch out, explosion!","About",() => "Watch out, explosion!",);
+    ModConfigMenu.AddSpace("Watch out, explosion!", "About");
+    ModConfigMenu.AddText("Watch out, explosion!", "About", () => `Version 0.5`);
 
-    ModConfigMenu.AddSpace("Watch out, boom!", "About");
-    ModConfigMenu.AddText("Watch out, boom!", "About", () => "Mod made by Tidloas with love");
-    ModConfigMenu.AddSpace("Watch out, boom!", "About");
+    ModConfigMenu.AddSpace("Watch out, explosion!", "About");
+    ModConfigMenu.AddText("Watch out, explosion!", "About", () => "Mod made by Tidloas with love");
+    ModConfigMenu.AddSpace("Watch out, explosion!", "About");
 
-    ModConfigMenu.AddSetting("Watch out, boom!", `Mains`, {
-      CurrentSetting: (): number => config.Effect,
+    ModConfigMenu.AddSetting("Watch out, explosion!", `Mains`, {
+      CurrentSetting: (): number => configWOExplosion.Effect,
       Maximum: 3,
       Minimum: 1,
       Display() {
         let onOff = "Full";
-        if (config.Effect == 2) {
+        if (configWOExplosion.Effect == 2) {
           onOff = "Pulse";
         }
-        if (config.Effect == 3) {
+        if (configWOExplosion.Effect == 3) {
           onOff = "Transparent";
         }
         return `Effect: ${onOff}`;
       },
       Info: [],
       OnChange: (currentValue: number | boolean | undefined): void => {
-        config.Effect = currentValue as number;
+        configWOExplosion.Effect = currentValue as number;
       },
       Type: ModConfigMenuOptionType.NUMBER,
     });
 
-    ModConfigMenu.AddSetting("Watch out, boom!", `Mains`, {
+    ModConfigMenu.AddSetting("Watch out, explosion!", `Mains`, {
       Type: ModConfigMenuOptionType.BOOLEAN,
       CurrentSetting() {
-        return config.AllowFoetus;
+        return configWOExplosion.AllowFoetus;
       },
       Display() {
         let onOff = "Disabled";
-        if (config.AllowFoetus == true) {
+        if (configWOExplosion.AllowFoetus == true) {
           onOff = "Enabled";
         }
         return `Dr Foetus: ${onOff}`;
       },
       OnChange(IsOn) {
-        config.AllowFoetus = IsOn as boolean;
+        configWOExplosion.AllowFoetus = IsOn as boolean;
       },
       Info: [`Dr Foetus have a danger zone ?`],
     });
 
     function addItem(entity, type, name, desc) {
-      ModConfigMenu.AddSetting("Watch out, boom!", `${type}`, {
+      ModConfigMenu.AddSetting("Watch out, explosion!", `${type}`, {
         Type: ModConfigMenuOptionType.BOOLEAN,
         CurrentSetting() {
-          return config[entity];
+          return configWOExplosion[entity];
         },
         Display() {
           let onOff = "Disabled";
-          if (config[entity] == true) {
+          if (configWOExplosion[entity] == true) {
             onOff = "Enabled";
           }
           return `${name}: ${onOff}`;
         },
         OnChange(IsOn) {
-          config[entity] = IsOn as boolean;
+          configWOExplosion[entity] = IsOn as boolean;
         },
         Info: [`${desc}`],
       });
@@ -85,7 +85,7 @@ export function ModConfig(config) {
     addItem("PootMine", "Mains", "Poot Mine", "Displays the area for Poot Mine");
     addItem("GreedCoin", "Mains", "Greed Coin", "Displays the area for Greed Bomb Coin");
 
-    ModConfigMenu.AddSpace("Watch out, boom!", "ChangeLog");
-    ModConfigMenu.AddText("Watch out, boom!", "ChangeLog", () => "Hello World");
+    ModConfigMenu.AddSpace("Watch out, explosion!", "ChangeLog");
+    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "Hello World");
   }
 }
