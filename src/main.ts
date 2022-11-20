@@ -1,5 +1,5 @@
-import { GridRoom, ModCallback } from "isaac-typescript-definitions";
-import { ModCallbackCustom, PickingUpItem, upgradeMod } from "isaacscript-common";
+import { GridRoom, ModCallback, ProjectileFlag, TearFlag } from "isaac-typescript-definitions";
+import { bitFlags, ModCallbackCustom, PickingUpItem, upgradeMod } from "isaacscript-common";
 import { config } from "./script/Config";
 import { ModConfig } from "./script/modConfigMenu";
 import { printConsole } from "isaacscript-common";
@@ -11,6 +11,7 @@ interface DangerExplosionData {
   DangerExplosion: int | undefined;
   ExplosionZoneLink: Entity | undefined;
   Grid: int | undefined;
+  Danger: int | undefined
 }
 
 let ActiveEnemy = [] as Entity[];
@@ -18,6 +19,7 @@ let ActiveGrid = []
 let ActiveZone = [] as Entity[];
 let ActiveProjectile = [] as Entity[];
 let hasNoDmg = false
+let hasIpecac = false
 
 main();
 
@@ -28,8 +30,9 @@ ExportWOEConfig = {
 
 function SpawnZoneExplosion(ent, EntSprite, data, scale, scale2, Ypos) {
   let anima = undefined;
-  if(config.Pulse == true){anima = Isaac.Spawn(1000,8746,0,Vector(ent.Position.X, ent.Position.Y-Ypos),Vector(0, 0),undefined,);} //* spawn the animation
-  else{anima = Isaac.Spawn(1000,8747,0,Vector(ent.Position.X, ent.Position.Y-Ypos),Vector(0, 0),undefined,);}
+    if(config.Effect == 2){anima = Isaac.Spawn(1000,8746,0,Vector(ent.Position.X, ent.Position.Y-Ypos),Vector(0, 0),undefined,);} //* spawn the animation
+    else if(config.Effect == 3){anima = Isaac.Spawn(1000,8747,0,Vector(ent.Position.X, ent.Position.Y-Ypos),Vector(0, 0),undefined,);}
+    else{anima = Isaac.Spawn(1000,8748,0,Vector(ent.Position.X, ent.Position.Y-Ypos),Vector(0, 0),undefined,);}
   anima.SpriteScale = Vector(scale, scale2);
   //anim.ToNPC().CanShutDoors = false
   anima.RenderZOffset = -6999;
@@ -40,6 +43,13 @@ function SpawnZoneExplosion(ent, EntSprite, data, scale, scale2, Ypos) {
 }
 
 function TntDetection() {
+  if(hasIpecac !== false && config.Ipecac == true){
+    let player = Isaac.GetPlayer()
+    let data = player.GetData()as unknown as DangerExplosionData
+      if(data.Danger !== 0){
+      data.Danger = 0
+    }
+  }
   if(config.TNT == false){
     return;
   }
@@ -53,8 +63,9 @@ function TntDetection() {
       if(element !== undefined){
         if(element.Desc.Type == 12 && element.State !== 4){
           let anima = undefined;
-          if(config.Pulse == true){anima = Isaac.Spawn(1000,8746,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);} //* spawn the animation
-          else{anima = Isaac.Spawn(1000,8747,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);}
+          if(config.Effect == 2){anima = Isaac.Spawn(1000,8746,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);} //* spawn the animation
+          else if(config.Effect == 3){anima = Isaac.Spawn(1000,8747,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);}
+          else{anima = Isaac.Spawn(1000,8748,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);}
           anima.SpriteScale = Vector(1, 1);
           //anim.ToNPC().CanShutDoors = false
           anima.RenderZOffset = -0;
@@ -179,6 +190,7 @@ function spawnCondition() {
 function postUpdate() {
   mobDetection();
   spawnCondition();
+  ProjectileCalculation()
 
   for (let index = 0; index < ActiveGrid.length-1; index++) {
     const elementGrid = ActiveGrid[index];
@@ -187,8 +199,83 @@ function postUpdate() {
         elementAnim.Remove();
       }
   }
+
+  if(hasIpecac !== false && config.Ipecac == true){
+    let player = Isaac.GetPlayer()
+    let data = player.GetData()as unknown as DangerExplosionData
+    if(data.Danger !== 1){
+      let anim = undefined;
+      if(config.Effect == 2){anim = Isaac.Spawn(1000,8749,0,Vector(player.Position.X, player.Position.Y),Vector(0, 0),undefined,).ToEffect();} //* spawn the animation
+      else if(config.Effect == 3){anim = Isaac.Spawn(1000,8750,0,Vector(player.Position.X, player.Position.Y),Vector(0, 0),undefined,).ToEffect();}
+      else{anim = Isaac.Spawn(1000,8751,0,Vector(player.Position.X, player.Position.Y),Vector(0, 0),undefined,).ToEffect();}
+
+    anim.SpriteScale = Vector(0.7, 0.7);
+    anim.FollowParent(player)
+    data.Danger = 1
+    }
+  }
 }
 
+//!PROJECTILE
+function spawnProjectileDanger(Projectile) {
+  let data = Projectile.GetData() as DangerExplosionData;
+  let anim = undefined;
+  if(config.Effect == 2){anim = Isaac.Spawn(1000,8746,0,Vector(Projectile.Position.X, Projectile.Position.Y),Vector(0, 0),undefined,);} //* spawn the animation
+  else if(config.Effect == 3){anim = Isaac.Spawn(1000,8747,0,Vector(Projectile.Position.X, Projectile.Position.Y),Vector(0, 0),undefined,);}
+  else{anim = Isaac.Spawn(1000,8748,0,Vector(Projectile.Position.X, Projectile.Position.Y),Vector(0, 0),undefined,);}
+  //anim.ToEffect().FollowParent(Projectile)
+  // anim.SetSize(-50, Vector(1,1), 0)
+  anim.SpriteScale = Vector(0.7, 0.7);
+  anim.Parent = Projectile;
+  ActiveProjectile.push(anim);
+  data.Danger = 1;
+}
+
+function ProjectileDetect(Projectile :EntityProjectile) {
+  if(config.Ipecac == true){
+    if(hasNoDmg == true){return}
+    let data = Projectile.GetData() as unknown as DangerExplosionData;
+    if(Projectile.HasProjectileFlags(bitFlags(ProjectileFlag.EXPLODE))){
+      if (data.Danger !== 1) {
+        spawnProjectileDanger(Projectile);
+        return;
+      }
+    }
+  }
+
+}
+
+function TearDetect(Projectile :EntityTear) {
+  if(config.Ipecac == true){
+    if(hasNoDmg == true){return}
+    let data = Projectile.GetData() as unknown as DangerExplosionData;
+    if(Projectile.HasTearFlags(bitFlags(TearFlag.EXPLOSIVE))){
+      if (data.Danger !== 1) {
+        spawnProjectileDanger(Projectile);
+        return;
+      }
+    }
+  }
+}
+
+function ProjectileCalculation() {
+  if (ActiveProjectile) {
+    ActiveProjectile.forEach((p) => {
+      if (!p?.Parent?.Exists()) {
+        p.Remove();
+        return;
+      } else {
+        // if(p.Parent.ToProjectile().Height>-20){
+        //   p.SpriteScale = Vector(0.7, 0.7)
+        // }else{
+        //   p.SpriteScale = Vector(0.7/(p.Parent.ToProjectile().Height/23), 0.7/(p.Parent.ToProjectile().Height/23))
+        // }
+        p.Position = p.Parent.Position;
+      }
+    });
+  }
+}
+//!END PROJECTILE
 
 function main() {
   const modVanilla = RegisterMod("BoomZoneWarning", 1);
@@ -224,12 +311,21 @@ function main() {
   }
   // //! END MOD CONFIG MENU
 
+  mod.AddCallback(ModCallback.POST_PROJECTILE_RENDER, ProjectileDetect);
+  mod.AddCallback(ModCallback.POST_TEAR_RENDER, TearDetect);
   mod.AddCallback(ModCallback.POST_UPDATE, postUpdate);
   mod.AddCallback(ModCallback.POST_NEW_ROOM, TntDetection);
+  mod.AddCallback(ModCallback.POST_GAME_STARTED, ()=>{
+    hasIpecac = false;
+    hasNoDmg = false
+  });
   mod.AddCallbackCustom(ModCallbackCustom.POST_ITEM_PICKUP,
     (player: EntityPlayer, pickingUpItem: PickingUpItem) => {
       if(pickingUpItem.subType == 223 || pickingUpItem.subType == 375){
         hasNoDmg = true
+      }
+      if(pickingUpItem.subType == 149){
+        hasIpecac = true
       }
     },
   );

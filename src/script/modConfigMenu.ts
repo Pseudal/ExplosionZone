@@ -12,21 +12,24 @@ export function ModConfig(config) {
     ModConfigMenu.AddSpace("Watch out, boom!", "About");
 
     ModConfigMenu.AddSetting("Watch out, boom!", `Mains`, {
-      Type: ModConfigMenuOptionType.BOOLEAN,
-      CurrentSetting() {
-        return config.Pulse;
-      },
+      CurrentSetting: (): number => config.Effect,
+      Maximum: 3,
+      Minimum: 1,
       Display() {
-        let onOff = "Disabled";
-        if (config.Pulse == true) {
-          onOff = "Enabled";
+        let onOff = "Full";
+        if (config.Effect == 2) {
+          onOff = "Pulse";
         }
-        return `Pulse effect: ${onOff}`;
+        if (config.Effect == 3) {
+          onOff = "Transparent";
+        }
+        return `Effect: ${onOff}`;
       },
-      OnChange(IsOn) {
-        config.Pulse = IsOn as boolean;
+      Info: [],
+      OnChange: (currentValue: number | boolean | undefined): void => {
+        config.Effect = currentValue as number;
       },
-      Info: [`Danger zone has pulse effect ?`],
+      Type: ModConfigMenuOptionType.NUMBER,
     });
 
     ModConfigMenu.AddSetting("Watch out, boom!", `Mains`, {
@@ -66,6 +69,7 @@ export function ModConfig(config) {
         Info: [`${desc}`],
       });
     }
+    addItem("Ipecac", "Mains", "Ipecac", "Show Ipecac zone");
     addItem("Bomb", "Mains", "Bomb", "Displays the area for 'classic' bombs");
     addItem("Troll", "Mains", "Troll", "Displays the area for 'troll' bombs");
     addItem("Megabomb", "Mains", "Mega bomb", "Displays the area for 'mega' bombs");

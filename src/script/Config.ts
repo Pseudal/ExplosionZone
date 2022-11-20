@@ -1,6 +1,7 @@
 export let config = {
-  Pulse: true,
+  Effect: 1,
   AllowFoetus: true,
+  Ipecac:false,
   Bomb: true,
   Troll: true,
   Mouche: true,
