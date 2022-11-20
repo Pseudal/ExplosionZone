@@ -1,5 +1,5 @@
 import { ModCallback, ProjectileFlag, TearFlag } from "isaac-typescript-definitions";
-import { bitFlags, ModCallbackCustom, PickingUpItem, upgradeMod } from "isaacscript-common";
+import { bitFlags, ModCallbackCustom, PickingUpItem, printConsole, upgradeMod } from "isaacscript-common";
 import { configWOExplosion } from "./script/Config";
 import { ModConfig } from "./script/modConfigMenu";
 import * as json from "json";
@@ -9,7 +9,7 @@ import * as json from "json";
 interface DangerExplosionData {
   DangerExplosion: int | undefined;
   ExplosionZoneLink: Entity | undefined;
-  Grid: int | undefined;
+  Grid: GridEntity | undefined;
   Danger: int | undefined
 }
 
@@ -45,32 +45,33 @@ function TntDetection() {
       data.Danger = 0
     }
   }
-  if(configWOExplosion.TNT == false){
-    return;
-  }
-  let room = Game().GetRoom()
-  let num = room.GetGridSize()
-  let enemy = []
-  if (num == 0) {
-  } else {
-    for (let index = 0; index < num; index++) {
-      const element = room.GetGridEntity(index)
-      if(element !== undefined){
-        if(element.Desc.Type == 12 && element.State !== 4){
-          let anima = undefined;
-          if(configWOExplosion.Effect == 2){anima = Isaac.Spawn(1000,8746,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);} //* spawn the animation
-          else if(configWOExplosion.Effect == 3){anima = Isaac.Spawn(1000,8747,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);}
-          else{anima = Isaac.Spawn(1000,8748,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);}
-          anima.SpriteScale = Vector(1, 1);
-          //anim.ToNPC().CanShutDoors = false
-          anima.RenderZOffset = -0;
-          enemy.push(element);
-          enemy.push(anima);
+
+  if(configWOExplosion.TNT == true){
+    let room = Game().GetRoom()
+    let num = room.GetGridSize()
+    let enemy = []
+    if (num == 0) {
+    } else {
+      for (let index = 0; index < num; index++) {
+        const element = room.GetGridEntity(index)
+        if(element !== undefined){
+          if(element.Desc.Type == 12 && element.State !== 4){
+            let anima = undefined;
+            if(configWOExplosion.Effect == 2){anima = Isaac.Spawn(1000,8746,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);} //* spawn the animation
+            else if(configWOExplosion.Effect == 3){anima = Isaac.Spawn(1000,8747,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);}
+            else{anima = Isaac.Spawn(1000,8748,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);}
+            let data2 = anima.GetData() as DangerExplosionData
+            anima.SpriteScale = Vector(1, 1);
+            anima.RenderZOffset = -0;
+            //enemy.push(element);
+            data2.Grid = element
+            enemy.push(anima);
+          }
         }
       }
     }
+    ActiveGrid = enemy;
   }
-  ActiveGrid = enemy;
 }
 
 //*Detect monsters in the room, first filtering
@@ -189,13 +190,18 @@ function postUpdate() {
   spawnCondition();
   ProjectileCalculation()
 
-  for (let index = 0; index < ActiveGrid.length-1; index++) {
-    const elementGrid = ActiveGrid[index];
-    const elementAnim = ActiveGrid[index+1];
-      if(elementGrid.State == 4){
-        elementAnim.Remove();
-      }
+  if(configWOExplosion.TNT == true){
+    for (let index = 0; index < ActiveGrid.length; index++) {
+      //const elementGrid = ActiveGrid[index];
+      const elementAnim = ActiveGrid[index];
+//      printConsole(`${ActiveGrid.length}`)
+      let data = elementAnim.GetData() as DangerExplosionData
+        if(data.Grid.State == 4){
+          elementAnim.Remove();
+        }
+    }
   }
+
 
   //*Detects if Isaac gets Ipecac
   if(hasIpecac !== false && configWOExplosion.Ipecac == true){
@@ -228,6 +234,7 @@ function spawnProjectileDanger(Projectile) {
   ActiveProjectile.push(anim);
   data.Danger = 1;
 }
+
 //*Detect the new enemy projectile
 function ProjectileDetect(Projectile :EntityProjectile) {
   if(configWOExplosion.Ipecac == true){
@@ -276,6 +283,23 @@ function ProjectileCalculation() {
   }
 }
 //!END PROJECTILE
+function gridCleaner(){
+  if (ActiveGrid) {
+    //printConsole(`trigger enemy`)
+    ActiveGrid = []
+  }
+}
+function cleaner() {
+
+  if (ActiveZone) {
+    //printConsole(`trigger enemy`)
+    ActiveZone = [] as Entity[];
+  }
+  if (ActiveProjectile) {
+    //printConsole(`trigger enemy`)
+    ActiveProjectile = [] as Entity[];
+  }
+}
 
 function main() {
   const modVanilla = RegisterMod("BoomZoneWarning", 1);
@@ -317,8 +341,12 @@ function main() {
   mod.AddCallback(ModCallback.POST_NEW_ROOM, TntDetection);
   mod.AddCallback(ModCallback.POST_GAME_STARTED, ()=>{
     hasIpecac = false;
-    hasNoDmg = false
+    hasNoDmg = false;
   });
+
+  mod.AddCallback(ModCallback.POST_NEW_ROOM, cleaner);
+  mod.AddCallback(ModCallback.PRE_GAME_EXIT, cleaner);
+  mod.AddCallback(ModCallback.POST_NEW_LEVEL, gridCleaner);
   mod.AddCallbackCustom(ModCallbackCustom.POST_ITEM_PICKUP,
     (player: EntityPlayer, pickingUpItem: PickingUpItem) => {
       if(pickingUpItem.subType == 223 || pickingUpItem.subType == 375){
