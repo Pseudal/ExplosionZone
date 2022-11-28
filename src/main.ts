@@ -1,10 +1,18 @@
-import { ModCallback, ProjectileFlag, TearFlag } from "isaac-typescript-definitions";
-import { bitFlags, ModCallbackCustom, PickingUpItem, upgradeMod } from "isaacscript-common";
+import {
+  EntityFlag,
+  ModCallback,
+  ProjectileFlag,
+  TearFlag,
+} from "isaac-typescript-definitions";
+import {
+  bitFlags,
+  ModCallbackCustom,
+  PickingUpItem,
+  upgradeMod,
+} from "isaacscript-common";
+import * as json from "json";
 import { configWOExplosion } from "./script/Config";
 import { ModConfig } from "./script/modConfigMenu";
-import * as json from "json";
-
-
 
 interface DangerExplosionData {
   DangerExplosion: int | undefined;
@@ -15,21 +23,47 @@ interface DangerExplosionData {
 }
 
 let ActiveEnemy = [] as Entity[];
-let ActiveGrid = []
+let ActiveGrid = [];
 let ActiveZone = [] as Entity[];
 let ActiveProjectile = [] as Entity[];
-let hasNoDmg = false
-let hasIpecac = false
+let hasNoDmg = false;
+let hasIpecac = false;
 
 main();
 
 function SpawnZoneExplosion(ent, EntSprite, data, scale, scale2, Ypos) {
   let anima = undefined;
-    if(configWOExplosion.Effect == 2){anima = Isaac.Spawn(1000,8746,0,Vector(ent.Position.X, ent.Position.Y-Ypos),Vector(0, 0),undefined,);} //* spawn the animation
-    else if(configWOExplosion.Effect == 3){anima = Isaac.Spawn(1000,8747,0,Vector(ent.Position.X, ent.Position.Y-Ypos),Vector(0, 0),undefined,);}
-    else{anima = Isaac.Spawn(1000,8748,0,Vector(ent.Position.X, ent.Position.Y-Ypos),Vector(0, 0),undefined,);}
+  if (configWOExplosion.Effect == 2) {
+    anima = Isaac.Spawn(
+      1000,
+      8746,
+      0,
+      Vector(ent.Position.X, ent.Position.Y - Ypos),
+      Vector(0, 0),
+      undefined,
+    );
+  } //* spawn the animation
+  else if (configWOExplosion.Effect == 3) {
+    anima = Isaac.Spawn(
+      1000,
+      8747,
+      0,
+      Vector(ent.Position.X, ent.Position.Y - Ypos),
+      Vector(0, 0),
+      undefined,
+    );
+  } else {
+    anima = Isaac.Spawn(
+      1000,
+      8748,
+      0,
+      Vector(ent.Position.X, ent.Position.Y - Ypos),
+      Vector(0, 0),
+      undefined,
+    );
+  }
   anima.SpriteScale = Vector(scale, scale2);
-  anima.Color = Color(1,1,1,configWOExplosion.Opacity*0.10)
+  anima.Color = Color(1, 1, 1, configWOExplosion.Opacity * 0.1);
   //anim.ToNPC().CanShutDoors = false
   anima.RenderZOffset = -69999;
   anima.ToEffect().FollowParent(ent); //*make the animation follow the trigger entity
@@ -40,34 +74,61 @@ function SpawnZoneExplosion(ent, EntSprite, data, scale, scale2, Ypos) {
 
 //*Detect tnt (grid)
 function TntDetection() {
-  if(hasIpecac !== false && configWOExplosion.Ipecac == true){//For room change
-    let player = Isaac.GetPlayer()
-    let data = player.GetData()as unknown as DangerExplosionData
-      if(data.Danger !== 0){
-      data.Danger = 0
+  if (hasIpecac !== false && configWOExplosion.Ipecac == true) {
+    //For room change
+    let player = Isaac.GetPlayer();
+    let data = player.GetData() as unknown as DangerExplosionData;
+    if (data.Danger !== 0) {
+      data.Danger = 0;
     }
   }
 
-  if(configWOExplosion.TNT == true){
-    let room = Game().GetRoom()
-    let num = room.GetGridSize()
-    let enemy = []
+  if (configWOExplosion.TNT == true) {
+    let room = Game().GetRoom();
+    let num = room.GetGridSize();
+    let enemy = [];
     if (num == 0) {
     } else {
       for (let index = 0; index < num; index++) {
-        const element = room.GetGridEntity(index)
-        if(element !== undefined){
-          if(element.Desc.Type == 12 && element.State !== 4){
+        const element = room.GetGridEntity(index);
+        if (element !== undefined) {
+          if (element.Desc.Type == 12 && element.State !== 4) {
             let anima = undefined;
-            if(configWOExplosion.Effect == 2){anima = Isaac.Spawn(1000,8746,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);} //* spawn the animation
-            else if(configWOExplosion.Effect == 3){anima = Isaac.Spawn(1000,8747,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);}
-            else{anima = Isaac.Spawn(1000,8748,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);}
-            let data2 = anima.GetData() as DangerExplosionData
-            anima.Color = Color(1,1,1,configWOExplosion.Opacity*0.10)
+            if (configWOExplosion.Effect == 2) {
+              anima = Isaac.Spawn(
+                1000,
+                8746,
+                0,
+                Vector(element.Position.X, element.Position.Y),
+                Vector(0, 0),
+                undefined,
+              );
+            } //* spawn the animation
+            else if (configWOExplosion.Effect == 3) {
+              anima = Isaac.Spawn(
+                1000,
+                8747,
+                0,
+                Vector(element.Position.X, element.Position.Y),
+                Vector(0, 0),
+                undefined,
+              );
+            } else {
+              anima = Isaac.Spawn(
+                1000,
+                8748,
+                0,
+                Vector(element.Position.X, element.Position.Y),
+                Vector(0, 0),
+                undefined,
+              );
+            }
+            let data2 = anima.GetData() as DangerExplosionData;
+            anima.Color = Color(1, 1, 1, configWOExplosion.Opacity * 0.1);
             anima.SpriteScale = Vector(1, 1);
             anima.RenderZOffset = -0;
             //enemy.push(element);
-            data2.Grid = element
+            data2.Grid = element;
             enemy.push(anima);
           }
         }
@@ -77,7 +138,7 @@ function TntDetection() {
   }
 }
 
-//*Detect monsters in the room, first filtering
+//*Detect monsters & bomb in the room, first filtering
 function mobDetection() {
   let entities = Isaac.GetRoomEntities();
 
@@ -85,19 +146,17 @@ function mobDetection() {
   if (entities.length === 0) {
   } else {
     entities.forEach((ent) => {
-      if (
-        (ent.Type == 4 || ent.Type ==292 || ent.IsEnemy())
-      ) {
+      if (ent.Type == 4 || ent.Type == 292 || ent.IsEnemy()) {
         enemy.push(ent);
       }
     });
   }
   ActiveEnemy = enemy;
-  if(ActiveZone.length > 0) {
+  if (ActiveZone.length > 0) {
     for (let index = 0; index < ActiveZone.length; index++) {
       const element = ActiveZone[index];
-      if(element.Parent == undefined){
-        element.Remove()
+      if (element.Parent == undefined) {
+        element.Remove();
       }
     }
   }
@@ -106,131 +165,259 @@ function mobDetection() {
 //*Condition list for spawn
 function spawnCondition() {
   ActiveEnemy.forEach((ent) => {
+    if (ent.Parent?.Type == 906) {
+      //fix hornfel bizarre visual bug
+      if (ent.HasEntityFlags(bitFlags(EntityFlag.FREEZE))) {
+        return;
+      }
+    }
+
     let data = ent.GetData() as unknown as DangerExplosionData;
     let EntSprite = ent.GetSprite();
     //debugComing(ent, EntSprite, data);
 
-    if(hasNoDmg == false) {
-      //printConsole(`${ent.ToNPC().Type} ${ent.ToNPC().GetChampionColorIdx()}`)
-      if(ent.Type == 4){
-        if (ent.ToBomb().IsFetus == true && configWOExplosion.AllowFoetus == false) {
-          return
+    if (hasNoDmg == false) {
+      if (ent.Type == 4) {
+        if (
+          ent.ToBomb().IsFetus == true &&
+          configWOExplosion.AllowFoetus == false
+        ) {
+          return;
         }
 
-        if(ent.Type == 4 && data.DangerExplosion !== 1 && configWOExplosion.Bomb == true){
-          if(ent.Variant == 0 || ent.Variant == 1|| ent.Variant == 2|| ent.Variant == 5|| ent.Variant == 6|| ent.Variant == 7|| ent.Variant == 8|| ent.Variant == 9|| ent.Variant == 10|| ent.Variant == 11|| ent.Variant == 12|| ent.Variant == 13|| ent.Variant == 14|| ent.Variant == 16|| ent.Variant == 19){
-            data.DangerExplosion = 1
-            SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
+        if (
+          ent.Type == 4 &&
+          data.DangerExplosion !== 1 &&
+          configWOExplosion.Bomb == true
+        ) {
+          if (
+            ent.Variant == 0 ||
+            ent.Variant == 1 ||
+            ent.Variant == 2 ||
+            ent.Variant == 5 ||
+            ent.Variant == 6 ||
+            ent.Variant == 7 ||
+            ent.Variant == 8 ||
+            ent.Variant == 9 ||
+            ent.Variant == 10 ||
+            ent.Variant == 11 ||
+            ent.Variant == 12 ||
+            ent.Variant == 13 ||
+            ent.Variant == 14 ||
+            ent.Variant == 16 ||
+            ent.Variant == 19
+          ) {
+            data.DangerExplosion = 1;
+            SpawnZoneExplosion(ent, EntSprite, data, 1, 1, 0);
           }
         }
 
-        if(ent.Type == 4 && data.DangerExplosion !== 1 && configWOExplosion.Troll == true){//Troll
-          if(ent.Variant == 3 || ent.Variant == 4 || ent.Variant == 18){
-            data.DangerExplosion = 1
-            SpawnZoneExplosion(ent, EntSprite, data, 1, 1, 0)
+        if (
+          ent.Type == 4 &&
+          data.DangerExplosion !== 1 &&
+          configWOExplosion.Troll == true
+        ) {
+          //Troll
+          if (ent.Variant == 3 || ent.Variant == 4 || ent.Variant == 18) {
+            data.DangerExplosion = 1;
+            SpawnZoneExplosion(ent, EntSprite, data, 1, 1, 0);
           }
         }
-        if(ent.Type == 4 && data.DangerExplosion !== 1 && (ent.Variant == 17 || ent.Variant == 20) && configWOExplosion.Megabomb == true && configWOExplosion.Bomb == true){
-          data.DangerExplosion = 1
-          SpawnZoneExplosion(ent, EntSprite, data, 1.5, 1.5, 0)
+        if (
+          ent.Type == 4 &&
+          data.DangerExplosion !== 1 &&
+          (ent.Variant == 17 || ent.Variant == 20) &&
+          configWOExplosion.Megabomb == true &&
+          configWOExplosion.Bomb == true
+        ) {
+          data.DangerExplosion = 1;
+          SpawnZoneExplosion(ent, EntSprite, data, 1.5, 1.5, 0);
         }
       }
-      if((ent.Type == 16 && ent.Variant ==2&& data.DangerExplosion !== 1 ) && configWOExplosion.Mulliboom == true){
-        data.DangerExplosion = 1
-        SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
+      if (
+        ent.Type == 16 &&
+        ent.Variant == 2 &&
+        data.DangerExplosion !== 1 &&
+        configWOExplosion.Mulliboom == true
+      ) {
+        data.DangerExplosion = 1;
+        SpawnZoneExplosion(ent, EntSprite, data, 1, 1, 0);
       }
 
-      if((ent.Type == 25 && (ent.Variant ==2||ent.Variant ==0||ent.Variant ==5)&& data.DangerExplosion !== 1) && configWOExplosion.Mouche == true){
-        data.DangerExplosion = 1
-        SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
+      if (
+        ent.Type == 25 &&
+        (ent.Variant == 2 || ent.Variant == 0 || ent.Variant == 5) &&
+        data.DangerExplosion !== 1 &&
+        configWOExplosion.Mouche == true
+      ) {
+        data.DangerExplosion = 1;
+        SpawnZoneExplosion(ent, EntSprite, data, 1, 1, 0);
       }
 
-      if((ent.Type == 301 && (ent.Variant ==0)&& data.DangerExplosion !== 1) && configWOExplosion.Bomb == true && configWOExplosion.PoisonMind == true){
-        data.DangerExplosion = 1
-        SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
+      if (
+        ent.Type == 301 &&
+        ent.Variant == 0 &&
+        data.DangerExplosion !== 1 &&
+        configWOExplosion.Bomb == true &&
+        configWOExplosion.PoisonMind == true
+      ) {
+        data.DangerExplosion = 1;
+        SpawnZoneExplosion(ent, EntSprite, data, 1, 1, 0);
       }
-      if((ent.Type == 55 && (ent.Variant !==0)&& data.DangerExplosion !== 1) && configWOExplosion.Leech == true){
-        data.DangerExplosion = 1
-        SpawnZoneExplosion(ent, EntSprite, data, 0.9, 0.9, 0)
+      if (
+        ent.Type == 55 &&
+        ent.Variant !== 0 &&
+        data.DangerExplosion !== 1 &&
+        configWOExplosion.Leech == true
+      ) {
+        data.DangerExplosion = 1;
+        SpawnZoneExplosion(ent, EntSprite, data, 0.9, 0.9, 0);
       }
-      if((ent.Type == 250 && (ent.Variant ==0)&& data.DangerExplosion !== 1) && configWOExplosion.Spider == true){
-        data.DangerExplosion = 1
-        SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
+      if (
+        ent.Type == 250 &&
+        ent.Variant == 0 &&
+        data.DangerExplosion !== 1 &&
+        configWOExplosion.Spider == true
+      ) {
+        data.DangerExplosion = 1;
+        SpawnZoneExplosion(ent, EntSprite, data, 1, 1, 0);
       }
-      if((ent.Type == 225 && (ent.Variant ==0)&& data.DangerExplosion !== 1) && configWOExplosion.Maw == true){
-        data.DangerExplosion = 1
-        SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
+      if (
+        ent.Type == 225 &&
+        ent.Variant == 0 &&
+        data.DangerExplosion !== 1 &&
+        configWOExplosion.Maw == true
+      ) {
+        data.DangerExplosion = 1;
+        SpawnZoneExplosion(ent, EntSprite, data, 1, 1, 0);
       }
-      if((ent.Type == 277 && (ent.Variant ==0)&& data.DangerExplosion !== 1)&& configWOExplosion.BlackBony == true){
-        data.DangerExplosion = 1
-        SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
+      if (
+        ent.Type == 277 &&
+        ent.Variant == 0 &&
+        data.DangerExplosion !== 1 &&
+        configWOExplosion.BlackBony == true
+      ) {
+        data.DangerExplosion = 1;
+        SpawnZoneExplosion(ent, EntSprite, data, 1, 1, 0);
       }
-      if((ent.Type == 892 && (ent.Variant ==0)&& data.DangerExplosion !== 1)&& configWOExplosion.Poofer == true){
-        data.DangerExplosion = 1
-        SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
+      if (
+        ent.Type == 892 &&
+        ent.Variant == 0 &&
+        data.DangerExplosion !== 1 &&
+        configWOExplosion.Poofer == true
+      ) {
+        data.DangerExplosion = 1;
+        SpawnZoneExplosion(ent, EntSprite, data, 1, 1, 0);
       }
-      if((ent.Type == 875 && (ent.Variant ==0)&& data.DangerExplosion !== 1)&& configWOExplosion.PootMine == true){
-        data.DangerExplosion = 1
-        SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
+      if (
+        ent.Type == 875 &&
+        ent.Variant == 0 &&
+        data.DangerExplosion !== 1 &&
+        configWOExplosion.PootMine == true
+      ) {
+        data.DangerExplosion = 1;
+        SpawnZoneExplosion(ent, EntSprite, data, 1, 1, 0);
       }
-      if((ent.Type == 293 && (ent.Variant ==2) && data.DangerExplosion !== 1 && ent.GetSprite().IsPlaying("PulseBomb"))&& configWOExplosion.GreedCoin == true){
-        data.DangerExplosion = 1
-        SpawnZoneExplosion(ent, EntSprite, data, 1.6, 1.6, 0)
+      if (
+        ent.Type == 293 &&
+        ent.Variant == 2 &&
+        data.DangerExplosion !== 1 &&
+        ent.GetSprite().IsPlaying("PulseBomb") &&
+        configWOExplosion.GreedCoin == true
+      ) {
+        data.DangerExplosion = 1;
+        SpawnZoneExplosion(ent, EntSprite, data, 1.6, 1.6, 0);
       }
-      if(ent.Type == 292 && data.DangerExplosion !== 1 && ent.ToNPC().State == 3 && ent.Variant !==751&& configWOExplosion.TNT == true){
-        data.DangerExplosion = 1
-        SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
+      if (
+        ent.Type == 292 &&
+        data.DangerExplosion !== 1 &&
+        ent.ToNPC().State == 3 &&
+        ent.Variant !== 751 &&
+        configWOExplosion.TNT == true
+      ) {
+        data.DangerExplosion = 1;
+        SpawnZoneExplosion(ent, EntSprite, data, 1, 1, 0);
       }
 
-      if((ent.IsDead() || ent.Exists() !== true || ( ent.Type == 292 && ent.ToNPC().State == 16) || (ent.Type == 293 && ent.Variant == 2 && ent.GetSprite().IsFinished("PulseBomb"))) && data.DangerExplosion == 1){
+      if (
+        (ent.IsDead() ||
+          ent.Exists() !== true ||
+          (ent.Type == 292 && ent.ToNPC().State == 16) ||
+          (ent.Type == 293 &&
+            ent.Variant == 2 &&
+            ent.GetSprite().IsFinished("PulseBomb"))) &&
+        data.DangerExplosion == 1
+      ) {
         data.ExplosionZoneLink.Remove();
-        if(ent.Type == 293)
-          data.DangerExplosion = -1;
-        else
-          data.DangerExplosion = 0;
+        if (ent.Type == 293) data.DangerExplosion = -1;
+        else data.DangerExplosion = 0;
       }
     }
   });
   //! security
 }
 
-
 //*Main post update
 function postUpdate() {
   mobDetection();
   spawnCondition();
-  ProjectileCalculation()
+  ProjectileCalculation();
 
-  if(configWOExplosion.TNT == true){
+  if (configWOExplosion.TNT == true) {
     for (let index = 0; index < ActiveGrid.length; index++) {
       //const elementGrid = ActiveGrid[index];
       const elementAnim = ActiveGrid[index];
-//      printConsole(`${ActiveGrid.length}`)
-      let data = elementAnim.GetData() as DangerExplosionData
-      if(data.exploded !== 1){
-        if(data.Grid?.State == 4){
+      //      printConsole(`${ActiveGrid.length}`)
+      let data = elementAnim.GetData() as DangerExplosionData;
+      if (data.exploded !== 1) {
+        if (data.Grid?.State == 4) {
           elementAnim.Remove();
-          data.exploded = 1
+          data.exploded = 1;
         }
       }
     }
   }
 
-
   //*Detects if Isaac gets Ipecac
-  if(hasIpecac !== false && configWOExplosion.Ipecac == true){
-    let player = Isaac.GetPlayer()
-    let data = player.GetData()as unknown as DangerExplosionData
-    if(data.Danger !== 1){
+  if (hasIpecac !== false && configWOExplosion.Ipecac == true) {
+    let player = Isaac.GetPlayer();
+    let data = player.GetData() as unknown as DangerExplosionData;
+    if (data.Danger !== 1) {
       let anim = undefined;
-      if(configWOExplosion.Effect == 2){anim = Isaac.Spawn(1000,8749,0,Vector(player.Position.X, player.Position.Y),Vector(0, 0),undefined,).ToEffect();} //* spawn the animation
-      else if(configWOExplosion.Effect == 3){anim = Isaac.Spawn(1000,8750,0,Vector(player.Position.X, player.Position.Y),Vector(0, 0),undefined,).ToEffect();}
-      else{anim = Isaac.Spawn(1000,8751,0,Vector(player.Position.X, player.Position.Y),Vector(0, 0),undefined,).ToEffect();}
-    anim.Color = Color(1,1,1,configWOExplosion.Opacity*0.10)
-    anim.Parent = player
-    anim.SpriteScale = Vector(0.7, 0.7);
-    anim.FollowParent(player)
-    data.Danger = 1
+      if (configWOExplosion.Effect == 2) {
+        anim = Isaac.Spawn(
+          1000,
+          8749,
+          0,
+          Vector(player.Position.X, player.Position.Y),
+          Vector(0, 0),
+          undefined,
+        ).ToEffect();
+      } //* spawn the animation
+      else if (configWOExplosion.Effect == 3) {
+        anim = Isaac.Spawn(
+          1000,
+          8750,
+          0,
+          Vector(player.Position.X, player.Position.Y),
+          Vector(0, 0),
+          undefined,
+        ).ToEffect();
+      } else {
+        anim = Isaac.Spawn(
+          1000,
+          8751,
+          0,
+          Vector(player.Position.X, player.Position.Y),
+          Vector(0, 0),
+          undefined,
+        ).ToEffect();
+      }
+      anim.Color = Color(1, 1, 1, configWOExplosion.Opacity * 0.1);
+      anim.Parent = player;
+      anim.SpriteScale = Vector(0.7, 0.7);
+      anim.FollowParent(player);
+      data.Danger = 1;
     }
   }
 }
@@ -239,12 +426,38 @@ function postUpdate() {
 function spawnProjectileDanger(Projectile) {
   let data = Projectile.GetData() as DangerExplosionData;
   let anim = undefined;
-  if(configWOExplosion.Effect == 2){anim = Isaac.Spawn(1000,8746,0,Vector(Projectile.Position.X, Projectile.Position.Y),Vector(0, 0),undefined,);} //* spawn the animation
-  else if(configWOExplosion.Effect == 3){anim = Isaac.Spawn(1000,8747,0,Vector(Projectile.Position.X, Projectile.Position.Y),Vector(0, 0),undefined,);}
-  else{anim = Isaac.Spawn(1000,8748,0,Vector(Projectile.Position.X, Projectile.Position.Y),Vector(0, 0),undefined,);}
+  if (configWOExplosion.Effect == 2) {
+    anim = Isaac.Spawn(
+      1000,
+      8746,
+      0,
+      Vector(Projectile.Position.X, Projectile.Position.Y),
+      Vector(0, 0),
+      undefined,
+    );
+  } //* spawn the animation
+  else if (configWOExplosion.Effect == 3) {
+    anim = Isaac.Spawn(
+      1000,
+      8747,
+      0,
+      Vector(Projectile.Position.X, Projectile.Position.Y),
+      Vector(0, 0),
+      undefined,
+    );
+  } else {
+    anim = Isaac.Spawn(
+      1000,
+      8748,
+      0,
+      Vector(Projectile.Position.X, Projectile.Position.Y),
+      Vector(0, 0),
+      undefined,
+    );
+  }
   //anim.ToEffect().FollowParent(Projectile)
   // anim.SetSize(-50, Vector(1,1), 0)
-  anim.Color = Color(1,1,1,configWOExplosion.Opacity*0.10)
+  anim.Color = Color(1, 1, 1, configWOExplosion.Opacity * 0.1);
   anim.SpriteScale = Vector(0.7, 0.7);
   anim.Parent = Projectile;
   ActiveProjectile.push(anim);
@@ -252,26 +465,29 @@ function spawnProjectileDanger(Projectile) {
 }
 
 //*Detect the new enemy projectile
-function ProjectileDetect(Projectile :EntityProjectile) {
-  if(configWOExplosion.Ipecac == true){
-    if(hasNoDmg == true){return}
+function ProjectileDetect(Projectile: EntityProjectile) {
+  if (configWOExplosion.Ipecac == true) {
+    if (hasNoDmg == true) {
+      return;
+    }
     let data = Projectile.GetData() as unknown as DangerExplosionData;
-    if(Projectile.HasProjectileFlags(bitFlags(ProjectileFlag.EXPLODE))){
+    if (Projectile.HasProjectileFlags(bitFlags(ProjectileFlag.EXPLODE))) {
       if (data.Danger !== 1) {
         spawnProjectileDanger(Projectile);
         return;
       }
     }
   }
-
 }
 
 //*Detect the new isaac projectile
-function TearDetect(Projectile :EntityTear) {
-  if(configWOExplosion.Ipecac == true){
-    if(hasNoDmg == true){return}
+function TearDetect(Projectile: EntityTear) {
+  if (configWOExplosion.Ipecac == true) {
+    if (hasNoDmg == true) {
+      return;
+    }
     let data = Projectile.GetData() as unknown as DangerExplosionData;
-    if(Projectile.HasTearFlags(bitFlags(TearFlag.EXPLOSIVE))){
+    if (Projectile.HasTearFlags(bitFlags(TearFlag.EXPLOSIVE))) {
       if (data.Danger !== 1) {
         spawnProjectileDanger(Projectile);
         return;
@@ -299,14 +515,13 @@ function ProjectileCalculation() {
   }
 }
 //!END PROJECTILE
-function gridCleaner(){
+function gridCleaner() {
   if (ActiveGrid) {
     //printConsole(`trigger enemy`)
-    ActiveGrid = []
+    ActiveGrid = [];
   }
 }
 function cleaner() {
-
   if (ActiveZone) {
     //printConsole(`trigger enemy`)
     ActiveZone = [] as Entity[];
@@ -322,7 +537,6 @@ function main() {
   const mod = upgradeMod(modVanilla);
   // Instantiate a new mod object, which grants the ability to add callback functions that
   // correspond to in-game events.
-
 
   // //! MOD CONFIG MENU
   // //steal on another mod, idk how it's work
@@ -355,7 +569,7 @@ function main() {
   mod.AddCallback(ModCallback.POST_TEAR_RENDER, TearDetect);
   mod.AddCallback(ModCallback.POST_UPDATE, postUpdate);
   mod.AddCallback(ModCallback.POST_NEW_ROOM, TntDetection);
-  mod.AddCallback(ModCallback.POST_GAME_STARTED, ()=>{
+  mod.AddCallback(ModCallback.POST_GAME_STARTED, () => {
     hasIpecac = false;
     hasNoDmg = false;
   });
@@ -363,21 +577,22 @@ function main() {
   mod.AddCallback(ModCallback.POST_NEW_ROOM, cleaner);
   mod.AddCallback(ModCallback.PRE_GAME_EXIT, cleaner);
   mod.AddCallback(ModCallback.POST_NEW_LEVEL, gridCleaner);
-  mod.AddCallbackCustom(ModCallbackCustom.POST_ITEM_PICKUP,
+  mod.AddCallbackCustom(
+    ModCallbackCustom.POST_ITEM_PICKUP,
     (player: EntityPlayer, pickingUpItem: PickingUpItem) => {
-      if(pickingUpItem.subType == 223 || pickingUpItem.subType == 375){
-        hasNoDmg = true
+      if (pickingUpItem.subType == 223 || pickingUpItem.subType == 375) {
+        hasNoDmg = true;
       }
-      if(pickingUpItem.subType == 149){
-        hasIpecac = true
+      if (pickingUpItem.subType == 149) {
+        hasIpecac = true;
       }
     },
   );
 }
 
-      // if(ent.ToNPC().IsChampion() == true){ //! useless, check if mod is explosive champion
-      //   if(ent.ToNPC().GetChampionColorIdx() == 5 && data.DangerExplosion !== 1 && configWOExplosion.Champion == true){
-      //     data.DangerExplosion = 1
-      //     SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
-      //   }
-      // }
+// if(ent.ToNPC().IsChampion() == true){ //! useless, check if mod is explosive champion
+//   if(ent.ToNPC().GetChampionColorIdx() == 5 && data.DangerExplosion !== 1 && configWOExplosion.Champion == true){
+//     data.DangerExplosion = 1
+//     SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
+//   }
+// }

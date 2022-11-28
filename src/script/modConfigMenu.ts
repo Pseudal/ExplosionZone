@@ -104,6 +104,7 @@ export function ModConfig(configWOExplosion) {
     ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "Added Opacity option");
     ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "Fix Fuse Cutter");
     ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "Fix WormWood bug");
+    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "fix a strange bug with Hornfel");
     ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "added a safety feature for zone deletion which should solve several problems");
   }
 }
