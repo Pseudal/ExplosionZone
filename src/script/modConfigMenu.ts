@@ -5,7 +5,7 @@ export function ModConfig(configWOExplosion) {
     ModConfigMenu.AddSpace("Watch out, explosion!", "About");
     ModConfigMenu.AddText("Watch out, explosion!","About",() => "Watch out, explosion!",);
     ModConfigMenu.AddSpace("Watch out, explosion!", "About");
-    ModConfigMenu.AddText("Watch out, explosion!", "About", () => `Version 0.6`);
+    ModConfigMenu.AddText("Watch out, explosion!", "About", () => `Version 0.7`);
 
     ModConfigMenu.AddSpace("Watch out, explosion!", "About");
     ModConfigMenu.AddText("Watch out, explosion!", "About", () => "Mod made by Tidloas with love");
@@ -28,6 +28,21 @@ export function ModConfig(configWOExplosion) {
       Info: [],
       OnChange: (currentValue: number | boolean | undefined): void => {
         configWOExplosion.Effect = currentValue as number;
+      },
+      Type: ModConfigMenuOptionType.NUMBER,
+    });
+
+    ModConfigMenu.AddSetting("Watch out, explosion!", `Mains`, {
+      CurrentSetting: (): number => configWOExplosion.Opacity,
+      Maximum: 10,
+      Minimum: 0,
+      Display() {
+        let onOff = configWOExplosion.Opacity;
+        return `Opacity: ${onOff*10}%`;
+      },
+      Info: [],
+      OnChange: (currentValue: number | boolean | undefined): void => {
+        configWOExplosion.Opacity = currentValue as number;
       },
       Type: ModConfigMenuOptionType.NUMBER,
     });
@@ -86,6 +101,9 @@ export function ModConfig(configWOExplosion) {
     addItem("GreedCoin", "Mains", "Greed Coin", "Displays the area for Greed Bomb Coin");
 
     ModConfigMenu.AddSpace("Watch out, explosion!", "ChangeLog");
-    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "better tnt");
+    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "Added Opacity option");
+    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "Fix Fuse Cutter");
+    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "Fix WormWood bug");
+    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "added a safety feature for zone deletion which should solve several problems");
   }
 }

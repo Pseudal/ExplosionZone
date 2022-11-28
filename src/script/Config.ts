@@ -1,5 +1,6 @@
 export let configWOExplosion = {
   Effect: 1,
+  Opacity: 10,
   AllowFoetus: false,
   Ipecac:false,
   Bomb: true,

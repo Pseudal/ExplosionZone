@@ -10,7 +10,8 @@ interface DangerExplosionData {
   DangerExplosion: int | undefined;
   ExplosionZoneLink: Entity | undefined;
   Grid: GridEntity | undefined;
-  Danger: int | undefined
+  Danger: int | undefined;
+  exploded: int | undefined;
 }
 
 let ActiveEnemy = [] as Entity[];
@@ -28,6 +29,7 @@ function SpawnZoneExplosion(ent, EntSprite, data, scale, scale2, Ypos) {
     else if(configWOExplosion.Effect == 3){anima = Isaac.Spawn(1000,8747,0,Vector(ent.Position.X, ent.Position.Y-Ypos),Vector(0, 0),undefined,);}
     else{anima = Isaac.Spawn(1000,8748,0,Vector(ent.Position.X, ent.Position.Y-Ypos),Vector(0, 0),undefined,);}
   anima.SpriteScale = Vector(scale, scale2);
+  anima.Color = Color(1,1,1,configWOExplosion.Opacity*0.10)
   //anim.ToNPC().CanShutDoors = false
   anima.RenderZOffset = -69999;
   anima.ToEffect().FollowParent(ent); //*make the animation follow the trigger entity
@@ -61,6 +63,7 @@ function TntDetection() {
             else if(configWOExplosion.Effect == 3){anima = Isaac.Spawn(1000,8747,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);}
             else{anima = Isaac.Spawn(1000,8748,0,Vector(element.Position.X, element.Position.Y),Vector(0, 0),undefined,);}
             let data2 = anima.GetData() as DangerExplosionData
+            anima.Color = Color(1,1,1,configWOExplosion.Opacity*0.10)
             anima.SpriteScale = Vector(1, 1);
             anima.RenderZOffset = -0;
             //enemy.push(element);
@@ -90,6 +93,14 @@ function mobDetection() {
     });
   }
   ActiveEnemy = enemy;
+  if(ActiveZone.length > 0) {
+    for (let index = 0; index < ActiveZone.length; index++) {
+      const element = ActiveZone[index];
+      if(element.Parent == undefined){
+        element.Remove()
+      }
+    }
+  }
 }
 
 //*Condition list for spawn
@@ -171,7 +182,7 @@ function spawnCondition() {
         SpawnZoneExplosion(ent, EntSprite, data, 1,1, 0)
       }
 
-      if((ent.IsDead() || ent.Exists() !== true ||( ent.Type == 292 && ent.ToNPC().State == 16) || (ent.Type == 293 && ent.Variant == 2 && ent.GetSprite().IsFinished("PulseBomb"))) && data.DangerExplosion == 1){
+      if((ent.IsDead() || ent.Exists() !== true || ( ent.Type == 292 && ent.ToNPC().State == 16) || (ent.Type == 293 && ent.Variant == 2 && ent.GetSprite().IsFinished("PulseBomb"))) && data.DangerExplosion == 1){
         data.ExplosionZoneLink.Remove();
         if(ent.Type == 293)
           data.DangerExplosion = -1;
@@ -196,9 +207,12 @@ function postUpdate() {
       const elementAnim = ActiveGrid[index];
 //      printConsole(`${ActiveGrid.length}`)
       let data = elementAnim.GetData() as DangerExplosionData
-        if(data.Grid.State == 4){
+      if(data.exploded !== 1){
+        if(data.Grid?.State == 4){
           elementAnim.Remove();
+          data.exploded = 1
         }
+      }
     }
   }
 
@@ -212,7 +226,8 @@ function postUpdate() {
       if(configWOExplosion.Effect == 2){anim = Isaac.Spawn(1000,8749,0,Vector(player.Position.X, player.Position.Y),Vector(0, 0),undefined,).ToEffect();} //* spawn the animation
       else if(configWOExplosion.Effect == 3){anim = Isaac.Spawn(1000,8750,0,Vector(player.Position.X, player.Position.Y),Vector(0, 0),undefined,).ToEffect();}
       else{anim = Isaac.Spawn(1000,8751,0,Vector(player.Position.X, player.Position.Y),Vector(0, 0),undefined,).ToEffect();}
-
+    anim.Color = Color(1,1,1,configWOExplosion.Opacity*0.10)
+    anim.Parent = player
     anim.SpriteScale = Vector(0.7, 0.7);
     anim.FollowParent(player)
     data.Danger = 1
@@ -229,6 +244,7 @@ function spawnProjectileDanger(Projectile) {
   else{anim = Isaac.Spawn(1000,8748,0,Vector(Projectile.Position.X, Projectile.Position.Y),Vector(0, 0),undefined,);}
   //anim.ToEffect().FollowParent(Projectile)
   // anim.SetSize(-50, Vector(1,1), 0)
+  anim.Color = Color(1,1,1,configWOExplosion.Opacity*0.10)
   anim.SpriteScale = Vector(0.7, 0.7);
   anim.Parent = Projectile;
   ActiveProjectile.push(anim);
