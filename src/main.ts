@@ -6,9 +6,6 @@ import {
 } from "isaac-typescript-definitions";
 import {
   bitFlags,
-  ModCallbackCustom,
-  PickingUpItem,
-  upgradeMod,
 } from "isaacscript-common";
 import * as json from "json";
 import { configWOExplosion } from "./script/Config";

@@ -5,7 +5,7 @@ export function ModConfig(configWOExplosion) {
     ModConfigMenu.AddSpace("Watch out, explosion!", "About");
     ModConfigMenu.AddText("Watch out, explosion!","About",() => "Watch out, explosion!",);
     ModConfigMenu.AddSpace("Watch out, explosion!", "About");
-    ModConfigMenu.AddText("Watch out, explosion!", "About", () => `Version 0.7`);
+    ModConfigMenu.AddText("Watch out, explosion!", "About", () => `Version 0.7.5`);
 
     ModConfigMenu.AddSpace("Watch out, explosion!", "About");
     ModConfigMenu.AddText("Watch out, explosion!", "About", () => "Mod made by Tidloas with love");
@@ -101,10 +101,7 @@ export function ModConfig(configWOExplosion) {
     addItem("GreedCoin", "Mains", "Greed Coin", "Displays the area for Greed Bomb Coin");
 
     ModConfigMenu.AddSpace("Watch out, explosion!", "ChangeLog");
-    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "Added Opacity option");
-    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "Fix Fuse Cutter");
-    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "Fix WormWood bug");
-    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "fix a strange bug with Hornfel");
-    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "added a safety feature for zone deletion which should solve several problems");
+    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "the problems with other mods like Rep+ ");
+    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "should be solved.");
   }
 }
