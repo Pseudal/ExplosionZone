@@ -5,7 +5,7 @@ import {
   TearFlag,
 } from "isaac-typescript-definitions";
 import {
-  bitFlags,
+  bitFlags, printConsole,
 } from "isaacscript-common";
 import * as json from "json";
 import { configWOExplosion } from "./script/Config";
@@ -28,7 +28,12 @@ let hasIpecac = false;
 
 main();
 
-function SpawnZoneExplosion(ent, EntSprite, data, scale, scale2, Ypos) {
+function SpawnZoneExplosion(ent :Entity, EntSprite, data, scale, scale2, Ypos) {
+  printConsole(`${ent.SpawnerEntity.Type}`)
+  if(ent.SpawnerEntity?.Type == 1 && Isaac.GetPlayer().HasCollectible(106)){
+    scale += 0.27
+    scale2 += 0.27
+  }
   let anima = undefined;
   if (configWOExplosion.Effect == 2) {
     anima = Isaac.Spawn(
