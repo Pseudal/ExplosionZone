@@ -5,7 +5,7 @@ export function ModConfig(configWOExplosion) {
     ModConfigMenu.AddSpace("Watch out, explosion!", "About");
     ModConfigMenu.AddText("Watch out, explosion!","About",() => "Watch out, explosion!",);
     ModConfigMenu.AddSpace("Watch out, explosion!", "About");
-    ModConfigMenu.AddText("Watch out, explosion!", "About", () => `Version 0.7.5`);
+    ModConfigMenu.AddText("Watch out, explosion!", "About", () => `Version 0.8`);
 
     ModConfigMenu.AddSpace("Watch out, explosion!", "About");
     ModConfigMenu.AddText("Watch out, explosion!", "About", () => "Mod made by Tidloas with love");
@@ -101,7 +101,8 @@ export function ModConfig(configWOExplosion) {
     addItem("GreedCoin", "Mains", "Greed Coin", "Displays the area for Greed Bomb Coin");
 
     ModConfigMenu.AddSpace("Watch out, explosion!", "ChangeLog");
-    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "the problems with other mods like Rep+ ");
-    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "should be solved.");
+    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "+Mr. Mega");
+    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "+Bomber boy");
+    ModConfigMenu.AddText("Watch out, explosion!", "ChangeLog", () => "Tweak for dr.Foetus");
   }
 }

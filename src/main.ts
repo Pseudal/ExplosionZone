@@ -1,11 +1,11 @@
 import {
-  EntityFlag,
-  ModCallback,
-  ProjectileFlag,
-  TearFlag,
+EntityFlag,
+ModCallback,
+ProjectileFlag,
+TearFlag
 } from "isaac-typescript-definitions";
 import {
-  bitFlags, printConsole,
+bitFlags,printConsole
 } from "isaacscript-common";
 import * as json from "json";
 import { configWOExplosion } from "./script/Config";
@@ -28,50 +28,108 @@ let hasIpecac = false;
 
 main();
 
-function SpawnZoneExplosion(ent :Entity, EntSprite, data, scale, scale2, Ypos) {
-  printConsole(`${ent.SpawnerEntity.Type}`)
-  if(ent.SpawnerEntity?.Type == 1 && Isaac.GetPlayer().HasCollectible(106)){
-    scale += 0.27
-    scale2 += 0.27
+function SpawnZoneExplosion(ent: Entity, EntSprite, data, scale, scale2, Ypos) {
+  let idEffect = 0;
+  switch (configWOExplosion.Effect) {
+    case 1:
+      idEffect = 8748;
+      break;
+    case 2:
+      idEffect = 8746;
+      break;
+    case 3:
+      idEffect = 8747;
+      break;
+  }
+  // printConsole(`${ent.Variant}`);
+  if (ent.SpawnerEntity?.Type == 1 && Isaac.GetPlayer().HasCollectible(106)) {
+    scale += 0.27;
+    scale2 += 0.27;
+  }
+  if (ent.ToBomb().IsFetus == true && Isaac.GetPlayer().HasCollectible(330)) {
+    scale -= 0.4;
+    scale2 -= 0.4;
   }
   let anima = undefined;
-  if (configWOExplosion.Effect == 2) {
-    anima = Isaac.Spawn(
-      1000,
-      8746,
-      0,
-      Vector(ent.Position.X, ent.Position.Y - Ypos),
-      Vector(0, 0),
-      undefined,
-    );
-  } //* spawn the animation
-  else if (configWOExplosion.Effect == 3) {
-    anima = Isaac.Spawn(
-      1000,
-      8747,
-      0,
-      Vector(ent.Position.X, ent.Position.Y - Ypos),
-      Vector(0, 0),
-      undefined,
-    );
+  let BboyPos = [
+    [0, 0],
+    [0, -100],
+    [0, 100],
+    [-100, 0],
+    [100, 0],
+    [0, -50],
+    [0, 50],
+    [-50, 0],
+    [50, 0],
+  ];
+  if (ent.SpawnerEntity?.Type == 1 && Isaac.GetPlayer().HasCollectible(353)) {
+    for (let index = 0; index < 9; index++) {
+      let scaleX = 0.65;
+      let scaleY = 0.65;
+      if (
+        ent.SpawnerEntity?.Type == 1 &&
+        Isaac.GetPlayer().HasCollectible(106)
+      ) {
+        scaleX += 0.15;
+        scaleY += 0.15;
+      }
+      if (
+        ent.ToBomb().IsFetus == true &&
+        Isaac.GetPlayer().HasCollectible(330)
+      ) {
+        scaleX -= 0.4;
+        scaleY -= 0.4;
+        BboyPos = [
+          [0, 0],
+          [0, -25],
+          [0, 25],
+          [-25, 0],
+          [25, 0],
+          [0, -50],
+          [0, 50],
+          [-50, 0],
+          [50, 0],
+        ];
+      }
+      anima = Isaac.Spawn(
+        1000,
+        idEffect,
+        0,
+        Vector(
+          ent.Position.X + BboyPos[index][0],
+          ent.Position.Y + BboyPos[index][1],
+        ),
+        Vector(0, 0),
+        undefined,
+      );
+      anima.SpriteScale = Vector(scaleX, scaleY);
+      anima.Color = Color(1, 1, 1, configWOExplosion.Opacity * 0.1);
+      //anim.ToNPC().CanShutDoors = false
+      anima.RenderZOffset = -69999;
+      anima.ToEffect().FollowParent(ent); //*make the animation follow the trigger entity
+      anima.Parent = ent; //* make the animation parent the trigger entity, for the suppression
+      ActiveZone.push(anima); //* activeZone used to retrieve the animation later
+      data.ExplosionZoneLink = anima;
+    }
   } else {
     anima = Isaac.Spawn(
       1000,
-      8748,
+      idEffect,
       0,
       Vector(ent.Position.X, ent.Position.Y - Ypos),
       Vector(0, 0),
       undefined,
     );
+
+    anima.SpriteScale = Vector(scale, scale2);
+    anima.Color = Color(1, 1, 1, configWOExplosion.Opacity * 0.1);
+    //anim.ToNPC().CanShutDoors = false
+    anima.RenderZOffset = -69999;
+    anima.ToEffect().FollowParent(ent); //*make the animation follow the trigger entity
+    anima.Parent = ent; //* make the animation parent the trigger entity, for the suppression
+    ActiveZone.push(anima); //* activeZone used to retrieve the animation later
+    data.ExplosionZoneLink = anima;
   }
-  anima.SpriteScale = Vector(scale, scale2);
-  anima.Color = Color(1, 1, 1, configWOExplosion.Opacity * 0.1);
-  //anim.ToNPC().CanShutDoors = false
-  anima.RenderZOffset = -69999;
-  anima.ToEffect().FollowParent(ent); //*make the animation follow the trigger entity
-  anima.Parent = ent; //* make the animation parent the trigger entity, for the suppression
-  ActiveZone.push(anima); //* activeZone used to retrieve the animation later
-  data.ExplosionZoneLink = anima;
 }
 
 //*Detect tnt (grid)
