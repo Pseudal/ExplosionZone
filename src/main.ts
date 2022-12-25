@@ -42,14 +42,19 @@ function SpawnZoneExplosion(ent: Entity, EntSprite, data, scale, scale2, Ypos) {
       break;
   }
   // printConsole(`${ent.Variant}`);
+  if (ent.Type == 4){
+    if (ent.ToBomb().IsFetus == true && Isaac.GetPlayer().HasCollectible(330)) {
+      scale -= 0.4;
+      scale2 -= 0.4;
+    }
+  }
+  if (ent.Type == 4){
   if (ent.SpawnerEntity?.Type == 1 && Isaac.GetPlayer().HasCollectible(106)) {
     scale += 0.27;
     scale2 += 0.27;
   }
-  if (ent.ToBomb().IsFetus == true && Isaac.GetPlayer().HasCollectible(330)) {
-    scale -= 0.4;
-    scale2 -= 0.4;
-  }
+}
+
   let anima = undefined;
   let BboyPos = [
     [0, 0],
@@ -62,7 +67,7 @@ function SpawnZoneExplosion(ent: Entity, EntSprite, data, scale, scale2, Ypos) {
     [-50, 0],
     [50, 0],
   ];
-  if (ent.SpawnerEntity?.Type == 1 && Isaac.GetPlayer().HasCollectible(353)) {
+  if (ent.Type == 4 && ent.SpawnerEntity?.Type == 1 && Isaac.GetPlayer().HasCollectible(353)) {
     for (let index = 0; index < 9; index++) {
       let scaleX = 0.65;
       let scaleY = 0.65;
